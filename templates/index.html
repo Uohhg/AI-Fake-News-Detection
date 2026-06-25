@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fake News Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-logo">AI</div>
+        Fake News Detector
+    </a>
+    <div class="nav-links">
+        <a href="/" class="active">Home</a>
+        <a href="/history">History</a>
+        <a href="/monitor">Live Monitor</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="hero">
+        <div class="hero-tag">AI FAKE NEWS DETECTION SYSTEM</div>
+        <h1>Verify any news article in seconds</h1>
+        <p>Paste an article or enter a URL to get a full credibility report</p>
+    </div>
+
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <div class="stats-bar">
+        <div class="stat">
+            <span class="stat-number">{{ stats.total }}</span>
+            <div class="stat-label">total checked</div>
+        </div>
+        <div class="stat">
+            <span class="stat-number real">{{ stats.real }}</span>
+            <div class="stat-label">real</div>
+        </div>
+        <div class="stat">
+            <span class="stat-number fake">{{ stats.fake }}</span>
+            <div class="stat-label">fake</div>
+        </div>
+        <div class="stat">
+            <span class="stat-number uncertain">{{ stats.uncertain }}</span>
+            <div class="stat-label">uncertain</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Check an article</h3>
+        <form action="/analyse" method="POST">
+
+            <div class="input-toggle">
+                <label>
+                    <input type="radio" name="input_type" value="text" checked
+                           onchange="toggleInput('text')">
+                    <span>Paste text</span>
+                </label>
+                <label>
+                    <input type="radio" name="input_type" value="url"
+                           onchange="toggleInput('url')">
+                    <span>Enter URL</span>
+                </label>
+            </div>
+
+            <div id="text-input">
+                <textarea name="article"
+                    placeholder="Paste your news article here..."></textarea>
+            </div>
+
+            <div id="url-input" style="display:none;">
+                <input type="text" name="url"
+                    placeholder="https://www.bbc.com/news/...">
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Analyse article
+            </button>
+
+        </form>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='particles.js') }}"></script>
+<script>
+function toggleInput(type) {
+    const textBox = document.getElementById('text-input');
+    const urlBox  = document.getElementById('url-input');
+
+    if (type === 'text') {
+        textBox.style.display = 'block';
+        urlBox.style.display   = 'none';
+        textBox.style.animation = 'none';
+        requestAnimationFrame(() => { textBox.style.animation = ''; });
+    } else {
+        urlBox.style.display   = 'block';
+        textBox.style.display  = 'none';
+        urlBox.style.animation = 'none';
+        requestAnimationFrame(() => { urlBox.style.animation = ''; });
+    }
+}
+</script>
+
+</body>
+</html>
