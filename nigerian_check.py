@@ -1,3 +1,4 @@
+
 # Nigerian Language and Context Checker
 # Detects Nigerian Pidgin, Yoruba, Hausa
 # and common Nigerian fake news patterns
@@ -12,8 +13,8 @@ NIGERIAN_PIDGIN_FAKE_PHRASES = [
 ]
 
 NIGERIAN_PIDGIN_REAL_PHRASES = [
-    'according to', 'dem say', 'e be like say', 'as e stand',
-    'for according to', 'dem confirm say', 'na so e be'
+    'dem say', 'e be like say', 'as e stand',
+    'dem confirm say', 'na so e be'
 ]
 
 YORUBA_FAKE_INDICATORS = [
