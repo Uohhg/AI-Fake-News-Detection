@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detection History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-logo">AI</div>
+        Fake News Detector
+    </a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/history" class="active">History</a>
+        <a href="/monitor">Live Monitor</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="hero" style="display:flex;align-items:center;justify-content:space-between;text-align:left;padding:24px 0">
+        <div>
+            <h2 style="margin-bottom:4px">Detection history</h2>
+            <p>All articles previously analysed by the system</p>
+        </div>
+        {% if predictions %}
+        <form action="/delete-all" method="POST" onsubmit="return confirm('Delete all history? This cannot be undone.');">
+            <button type="submit" class="btn-danger">Clear all history</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+        {% if predictions %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Article preview</th>
+                    <th>AI result</th>
+                    <th>Score</th>
+                    <th>Verdict</th>
+                    <th>Feedback</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in predictions %}
+                <tr style="animation-delay: {{ loop.index0 * 0.04 }}s">
+                    <td style="white-space:nowrap;color:#7d8aa3">
+                        {{ row[1][:16] if row[1] else '' }}
+                    </td>
+                    <td>{{ (row[3][:70] if row[3] else row[4][:70]) }}...</td>
+                    <td>
+                        <span class="badge
+                            {% if row[5] == 'REAL' %}badge-real
+                            {% else %}badge-fake{% endif %}">
+                            {{ row[5] }}
+                        </span>
+                    </td>
+                    <td><strong>{{ row[13] }}</strong>/100</td>
+                    <td>
+                        <span class="badge
+                            {% if row[14] == 'REAL NEWS' %}badge-real
+                            {% elif row[14] == 'FAKE NEWS' %}badge-fake
+                            {% else %}badge-uncertain{% endif %}">
+                            {{ row[14] }}
+                        </span>
+                    </td>
+                    <td style="color:#7d8aa3">{{ row[15] or '—' }}</td>
+                    <td style="text-align:right">
+                        <a href="/delete/{{ row[0] }}"
+                           onclick="return confirm('Delete this article from history?');"
+                           style="color:#f87171;font-size:11px;text-decoration:none;border:1px solid #4d1c1c;padding:5px 10px;border-radius:6px;display:inline-block">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            No articles checked yet. Go to the home page to analyse an article.
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='particles.js') }}"></script>
+</body>
+</html>

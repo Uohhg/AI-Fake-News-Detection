@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <div class="nav-logo">AI</div>
+        Fake News Detector
+    </a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/history">History</a>
+        <a href="/monitor">Live Monitor</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="verdict-banner
+        {% if result.verdict == 'REAL NEWS' %}verdict-real
+        {% elif result.verdict == 'FAKE NEWS' %}verdict-fake
+        {% else %}verdict-uncertain{% endif %}">
+        <div>
+            <div class="verdict-title">{{ result.verdict }}</div>
+            <div class="verdict-sub">
+                {% if result.verdict == 'REAL NEWS' %}
+                    High credibility — verified by analysis
+                {% elif result.verdict == 'FAKE NEWS' %}
+                    Low credibility — likely misinformation
+                {% else %}
+                    Uncertain — manual verification recommended
+                {% endif %}
+            </div>
+        </div>
+        <div class="verdict-score">
+            <div class="big-score">{{ result.credibility }}</div>
+            <div class="score-label-sm">credibility score</div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+
+        <div class="card" style="margin:0">
+            <h3>Credibility breakdown</h3>
+            <div class="score-row">
+                <span class="score-row-label">AI pattern score</span>
+                <div class="score-track">
+                    <div class="score-fill" style="width:{{ result.ai_score }}%"></div>
+                </div>
+                <span class="score-value">{{ result.ai_score }}</span>
+            </div>
+            <div class="score-row">
+                <span class="score-row-label">Emotional language</span>
+                <div class="score-track">
+                    <div class="score-fill" style="width:{{ result.emotional_score }}%"></div>
+                </div>
+                <span class="score-value">{{ result.emotional_score }}</span>
+            </div>
+            <div class="score-row">
+                <span class="score-row-label">Writing quality</span>
+                <div class="score-track">
+                    <div class="score-fill" style="width:{{ result.writing_score }}%"></div>
+                </div>
+                <span class="score-value">{{ result.writing_score }}</span>
+            </div>
+            <div class="score-row">
+                <span class="score-row-label">Clickbait detection</span>
+                <div class="score-track">
+                    <div class="score-fill" style="width:{{ result.clickbait_score }}%"></div>
+                </div>
+                <span class="score-value">{{ result.clickbait_score }}</span>
+            </div>
+        </div>
+
+        <div class="card" style="margin:0">
+            <h3>Online verification</h3>
+            {% if result.trusted_found %}
+                <div class="alert alert-success">
+                    Found on {{ result.trusted_found|length }} trusted source(s)
+                </div>
+                {% for item in result.trusted_found %}
+                <div class="source-item trusted">
+                    <div class="source-name">{{ item.source }}</div>
+                    <div class="source-title">{{ item.title[:80] }}</div>
+                    <a href="{{ item.url }}" target="_blank" class="source-url">
+                        View article
+                    </a>
+                </div>
+                {% endfor %}
+            {% elif result.fake_found %}
+                <div class="alert alert-error">
+                    Found on {{ result.fake_found|length }} fake source(s)
+                </div>
+                {% for item in result.fake_found %}
+                <div class="source-item fake">
+                    <div class="source-name">{{ item.source }}</div>
+                    <div class="source-title">{{ item.title[:80] }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning">
+                    Not found on any known news source
+                </div>
+                {% for url in result.all_results %}
+                <div class="source-item">
+                    <a href="{{ url }}" target="_blank" class="source-url">
+                        {{ url[:55] }}...
+                    </a>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% if result.nigerian.is_nigerian_content %}
+    <div class="card">
+        <h3>Nigerian context analysis</h3>
+        <div class="nigerian-card">
+            <strong>Language detected:</strong> {{ result.nigerian.language_detected }} |
+            <strong>Nigerian score:</strong> {{ result.nigerian.nigerian_score }}/100
+        </div>
+        {% for exp in result.nigerian.explanation %}
+        <div class="reason-item">
+            <div class="reason-num">!</div>
+            <div>{{ exp }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Why this decision was made</h3>
+        {% for reason in result.reasons %}
+        <div class="reason-item">
+            <div class="reason-num">{{ loop.index }}</div>
+            <div>{{ reason }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Was this prediction correct?</h3>
+        <p style="font-size:12px;color:#7d8aa3;margin-bottom:4px">
+            Your feedback helps improve the model over time
+        </p>
+        <div class="feedback-buttons">
+            <a href="/feedback/{{ result.prediction_id }}/correct"
+               class="btn-success">Yes, correct</a>
+            <a href="/feedback/{{ result.prediction_id }}/wrong"
+               class="btn-danger">No, it was wrong</a>
+        </div>
+    </div>
+
+    <a href="/" class="btn-primary">Check another article</a>
+
+</div>
+
+<script src="{{ url_for('static', filename='particles.js') }}"></script>
+</body>
+</html>
