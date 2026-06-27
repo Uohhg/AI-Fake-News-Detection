@@ -15,6 +15,10 @@ This repository contains a fake news detection project built using machine learn
 - Command-line interface for text and URL analysis
 - Training and model serialization with `train_model.py`
 
+## Live Demo
+
+Try the application here: https://ai-fake-news-detection-2-mlxj.onrender.com
+
 ## Files and Structure
 
 - `app.py` - Main application interface for running the news checker
